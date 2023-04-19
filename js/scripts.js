@@ -1,32 +1,39 @@
-// Initialize an empty array to store the Pokemon list
-let pokemonList = [
-  { name: 'Bulbasaur', height: 0.7, type: ['grass', 'poison'] },
-  { name: 'Ivysaur', height: 1, type: ['grass', 'poison'] },
-  { name: 'Venusaur', height: 2, type: ['grass', 'poison'] },
-  { name: 'Charmender', height: 0.6, type: ['fire'] },
-  { name: 'Charmeleon', height: 1.1, type: ['fire'] },
-  { name: 'Charizard', height: 1.7, type: ['fire', 'flying'] },
-];
+let pokemonRepository = (function() {
+  let pokemonList = [
+    { name: 'Bulbasaur', height: 0.7, type: ['grass', 'poison'] },
+    { name: 'Ivysaur', height: 1, type: ['grass', 'poison'] },
+    { name: 'Venusaur', height: 2, type: ['grass', 'poison'] },
+    { name: 'Charmender', height: 0.6, type: ['fire'] },
+    { name: 'Charmeleon', height: 1.1, type: ['fire'] },
+    { name: 'Charizard', height: 1.7, type: ['fire', 'flying'] },
+  ];
 
-// Get the pokedex-list element from the HTML
+  function getAll() {
+    return pokemonList;
+  }
+
+  function add(item) {
+    pokemonList.push(item);
+  }
+
+  return {
+    getAll: getAll,
+    add: add,
+  };
+})();
+
 let pokedexList = document.getElementById('pokedex-list');
 
-// Use forEach() to iterate over the Pokemon in the pokemonList array
-pokemonList.forEach(function(pokemon) {
-  // Create a list item for the current Pokemon
+pokemonRepository.getAll().forEach(function(pokemon) {
   let listItem = document.createElement('li');
   listItem.innerHTML = 'Added ' + pokemon.name + ' to the Pokedex. Its height is: ' + pokemon.height;
 
-  // Check if the current Pokemon has a height greater than 1.0
   if (pokemon.height > 1.0) {
-    // Create a span element to display the "That's a big boy!" text
     let bigText = document.createElement('span');
     bigText.innerHTML = " That's a big boy!";
     bigText.classList.add('big');
-
-    // Append the bigText span to the listItem
     listItem.appendChild(bigText);
   }
-  // Append the listItem to the pokedexList
+
   pokedexList.appendChild(listItem);
 });
