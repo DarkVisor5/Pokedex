@@ -25,9 +25,38 @@ let pokemonRepository = (function () {
 
   function showDetails(pokemon) {
     loadDetails(pokemon).then(function () {
-      console.log(pokemon);
+      let modal = document.getElementById('pokemon-modal');
+      let span = document.getElementsByClassName('close')[0];
+  
+      // Update the modal content
+      document.getElementById('pokemon-name').textContent = pokemon.name;
+      document.getElementById('pokemon-height').textContent = pokemon.height;
+      document.getElementById('pokemon-image').src = pokemon.imageUrl;
+  
+      // Open the modal
+      modal.style.display = 'block';
+  
+      // Close the modal when the user clicks on the close button
+      span.onclick = function () {
+        modal.style.display = 'none';
+      };
+  
+      // Close the modal when the user clicks outside of the modal content
+      window.onclick = function (event) {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      };
+  
+      // Close the modal when the user presses the Escape key
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          modal.style.display = 'none';
+        }
+      });
     });
   }
+  
 
   function loadList() {
     showLoadingMessage();
@@ -60,8 +89,9 @@ let pokemonRepository = (function () {
         return response.json();
       })
       .then(function (details) {
-        item.imageUrl = details.sprites.front_default;
-        item.height = details.height;
+        // Use optional chaining and nullish coalescing to handle potential undefined values
+        item.imageUrl = details?.sprites?.front_default ?? '';
+        item.height = details?.height ?? 0;
       })
       .catch(function (e) {
         console.error(e);
@@ -70,6 +100,7 @@ let pokemonRepository = (function () {
         hideLoadingMessage();
       });
   }
+  
 
   function showLoadingMessage() {
     let loadingContainer = document.querySelector('#loading-container');
