@@ -4,27 +4,39 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Simple JS App</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.4/fetch.min.js"></script>
 </head>
 <body>
-    <div id="pokedex-container">
-        <h1>Pokedex</h1>
-        <ul id="pokedex-list"></ul>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" href="#">Pokedex</a>
+    </nav>
+    <div class="container mt-4">
+        <ul id="pokedex-list" class="list-group"></ul>
     </div>
     <div id="loading-container"></div>
     
     <!-- Add the modal structure -->
-    <div id="pokemon-modal" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="pokemon-name"></h2>
-        <p>Height: <span id="pokemon-height"></span></p>
-        <img id="pokemon-image" src="" alt="">
-      </div>
+    <div class="modal" tabindex="-1" role="dialog" id="pokemon-modal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pokemon-name"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Height: <span id="pokemon-height"></span></p>
+                    <img id="pokemon-image" src="" alt="">
+                </div>
+            </div>
+        </div>
     </div>
-
     <script src="js/scripts.js"></script>
 </body>
 </html>

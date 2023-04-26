@@ -12,51 +12,29 @@ let pokemonRepository = (function () {
   function addListItem(pokemon) {
     let pokedexList = document.querySelector('#pokedex-list');
     let listItem = document.createElement('li');
+    listItem.classList.add('list-group-item');
     let button = document.createElement('button');
     button.innerText = pokemon.name;
-    button.classList.add('buttonNice');
+    button.classList.add('btn', 'btn-primary', 'w-100');
+    button.setAttribute('data-toggle', 'modal');
+    button.setAttribute('data-target', '#pokemon-modal');
     button.addEventListener('click', function () {
       showDetails(pokemon);
     });
     listItem.appendChild(button);
     pokedexList.appendChild(listItem);
   }
-  
 
   function showDetails(pokemon) {
     loadDetails(pokemon).then(function () {
       let modal = document.getElementById('pokemon-modal');
-      let span = document.getElementsByClassName('close')[0];
   
       // Update the modal content
       document.getElementById('pokemon-name').textContent = pokemon.name;
       document.getElementById('pokemon-height').textContent = pokemon.height;
       document.getElementById('pokemon-image').src = pokemon.imageUrl;
-  
-      // Open the modal
-      modal.style.display = 'block';
-  
-      // Close the modal when the user clicks on the close button
-      span.onclick = function () {
-        modal.style.display = 'none';
-      };
-  
-      // Close the modal when the user clicks outside of the modal content
-      window.onclick = function (event) {
-        if (event.target === modal) {
-          modal.style.display = 'none';
-        }
-      };
-  
-      // Close the modal when the user presses the Escape key
-      document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-          modal.style.display = 'none';
-        }
-      });
     });
   }
-  
 
   function loadList() {
     showLoadingMessage();
@@ -89,9 +67,8 @@ let pokemonRepository = (function () {
         return response.json();
       })
       .then(function (details) {
-        // Use optional chaining and nullish coalescing to handle potential undefined values
-        item.imageUrl = details?.sprites?.front_default ?? '';
-        item.height = details?.height ?? 0;
+        item.imageUrl = details.sprites.front_default;
+        item.height = details.height;
       })
       .catch(function (e) {
         console.error(e);
@@ -100,7 +77,6 @@ let pokemonRepository = (function () {
         hideLoadingMessage();
       });
   }
-  
 
   function showLoadingMessage() {
     let loadingContainer = document.querySelector('#loading-container');
@@ -114,7 +90,6 @@ let pokemonRepository = (function () {
       loadingMessageElement.style.display = 'block';
     }
   }
-  
   
   function hideLoadingMessage() {
     let loadingMessageElement = document.querySelector('#loading-message');
