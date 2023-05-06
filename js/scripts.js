@@ -1,109 +1,98 @@
-/* global $ */
-const pokemonRepository = (function () {
-  const pokemonList = []
+'use strict';
 
-  function getAll () {
-    return pokemonList
-  }
+function loadPokedex() {
+  const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=151';
 
-  function add (item) {
-    pokemonList.push(item)
-  }
+  const loadingMessage = $('<div>').text('Loading...');
+  $('#loading-container').append(loadingMessage);
 
-  function addListItem (pokemon) {
-    const pokedexList = $('#pokedex-list')
-    const listItem = $('<li></li>')
-    listItem.addClass('list-group-item')
-    const button = $('<button></button>')
-    button.text(pokemon.name)
-    button.addClass('btn btn-primary w-100')
-    button.attr('data-toggle', 'modal')
-    button.attr('data-target', '#pokemon-modal')
-    button.on('click', function () {
-      showDetails(pokemon)
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      loadingMessage.remove();
+
+      const pokedexList = $('#pokedex-list');
+      for (let i = 0; i < data.results.length; i++) {
+        const pokemonName = data.results[i].name;
+        const pokemonUrl = data.results[i].url;
+        const pokemonId = pokemonUrl.split('/').slice(-2, -1)[0];
+        const pokemonImage = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
+
+        fetch(pokemonUrl)
+          .then(response => response.json())
+          .then(pokemonData => {
+            const pokemonType = pokemonData.types[0].type.name;
+            const pokemonHeight = pokemonData.height;
+            const pokemonCell = $('<li>').addClass('list-group-item');
+            const pokemonLink = $('<a>').addClass('btn btn-primary').attr('href', '#').text(pokemonName);
+            const pokemonIcon = $('<img>').attr('src', pokemonImage).attr('alt', pokemonName).addClass('ml-2');
+            pokemonLink.append(pokemonIcon);
+            pokemonCell.append(pokemonLink);
+            pokemonCell.css('background-color', getBackgroundColorForType(pokemonType));
+            pokedexList.append(pokemonCell);
+
+            pokemonLink.click(() => {
+              $('#pokemon-name').text(pokemonName);
+              $('#pokemon-height').text(pokemonHeight);
+              $('#pokemon-image').attr('src', pokemonImage);
+              $('#pokemon-modal').modal('show');
+            });
+          });
+      }
     })
-    listItem.append(button)
-    pokedexList.append(listItem)
-  }
+    .catch(error => {
+      loadingMessage.remove();
+      const errorMessage = $('<div>').text('Failed to load Pokedex.');
+      $('#loading-container').append(errorMessage);
+    });
+}
 
-  function showDetails (pokemon) {
-    loadDetails(pokemon).then(function () {
-      // Update the modal content
-      $('#pokemon-name').text(pokemon.name)
-      $('#pokemon-height').text(pokemon.height)
-      $('#pokemon-image').attr('src', pokemon.imageUrl)
-    })
-  }
+function getBackgroundColorForType(type) {
+  const typeColors = {
+    normal: "#A8A878",
+    fire : "#F08030",
+    water : "#6890F0",
+    electric: "#F8D030",
+    grass: "#78C850",
+    ice: "#98D8D8",
+    fighting:"#C03028",
+    poison: "#A040A0",
+    ground :"#E0C068",
+    flying :"#A890F0",
+    psychic: "#F85888",
+    bug : "#A8B820",
+    rock : "#B8A038",
+    ghost: "#705898",
+    dragon: "#7038F8",
+    dark: "#705848",
+    steel :"#B8B8D0",
+    fairy: "#EE99AC",
+  };
 
-  function loadList () {
-    showLoadingMessage()
-    return $.ajax('https://pokeapi.co/api/v2/pokemon/?limit=151', {
-      dataType: 'json'
-    })
-      .then(function (response) {
-        response.results.forEach(function (item) {
-          const pokemon = {
-            name: item.name,
-            detailsUrl: item.url
-          }
-          add(pokemon)
-        })
-      })
-      .catch(function (e) {
-        console.error(e)
-      })
-      .always(function () {
-        hideLoadingMessage()
-      })
-  }
+  return typeColors[type] || "#F3F3F3"; // Default to a light gray if the type is not found
+}
 
-  function loadDetails (item) {
-    showLoadingMessage()
-    const url = item.detailsUrl
-    return $.ajax(url, {
-      dataType: 'json'
-    })
-      .then(function (details) {
-        item.imageUrl = details.sprites.front_default
-        item.height = details.height
-      })
-      .catch(function (e) {
-        console.error(e)
-      })
-      .always(function () {
-        hideLoadingMessage()
-      })
-  }
+function searchPokemon() {
+  const searchBar = $('#search-bar');
+  const searchTerm = searchBar.val().toLowerCase().trim();
 
-  function showLoadingMessage () {
-    const loadingContainer = $('#loading-container')
-    let loadingMessageElement = $('#loading-message')
-    if (!loadingMessageElement.length) {
-      loadingMessageElement = $('<p></p>')
-      loadingMessageElement.attr('id', 'loading-message')
-      loadingMessageElement.text('Loading...')
-      loadingContainer.append(loadingMessageElement)
-    } else {
-      loadingMessageElement.show()
-    }
+  if (searchTerm) {
+    $('#pokedex-list > li').each(function() {
+      const pokemonName = $(this).find('a').text().toLowerCase();
+      if (pokemonName.includes(searchTerm)) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  } else {
+    // If the search term is empty, show all Pokemon
+    $('#pokedex-list > li').show();
   }
-  function hideLoadingMessage () {
-    const loadingMessageElement = $('#loading-message')
-    if (loadingMessageElement.length) {
-      loadingMessageElement.hide()
-    }
-  }
-  return {
-    getAll,
-    add,
-    addListItem,
-    loadList,
-    loadDetails
-  }
-})()
+}
 
-pokemonRepository.loadList().then(function () {
-  pokemonRepository.getAll().forEach(function (pokemon) {
-    pokemonRepository.addListItem(pokemon)
-  })
-})
+$(document).ready(() => {
+  loadPokedex();
+  $('#search-button').click(searchPokemon);
+  $('#search-bar').on('input', searchPokemon);
+});
