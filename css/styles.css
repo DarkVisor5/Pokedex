@@ -27,3 +27,23 @@ body {
   max-width: 100%;
   height: auto;
 }
+
+#pokedex-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.btn-primary {
+  background-color: transparent;
+  border: none; /* Add this line to remove the border */
+  color: inherit; /* Add this line to inherit the text color from the list item */
+}
+
+/* Add this block to change the hover behavior */
+.btn-primary:hover {
+  background-color: rgba(255, 255, 255, 0.3); /* Change the hover background color */
+  color: inherit;
+}
